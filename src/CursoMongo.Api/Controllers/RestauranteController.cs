@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using CursoMongo.Api.Controllers.Inputs;
+using CursoMongo.Api.Data.Repositories;
 using CursoMongo.Api.Domain.Entities;
 using CursoMongo.Api.Domain.Enums;
 using CursoMongo.Api.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace CursoMongo.Api.Controllers
 {
     [ApiController]
     public class RestauranteController : ControllerBase
     {
+        private readonly RestauranteRepository _restauranteRepository;
+
+        public RestauranteController(RestauranteRepository restauranteRepository)
+        {
+            _restauranteRepository = restauranteRepository;
+        }
+
         [HttpPost("restaurante")]
         public ActionResult IncluirRestaurante([FromBody] RestauranteInclusao restauranteInclusao)
         {
