@@ -5,6 +5,7 @@ using CursoMongo.Api.Domain.Entities;
 using CursoMongo.Api.Domain.ValueObjects;
 using MongoDB.Driver;
 using System.Linq;
+using CursoMongo.Api.Domain.Enums;
 
 namespace CursoMongo.Api.Data.Repositories
 {
@@ -59,6 +60,37 @@ namespace CursoMongo.Api.Data.Repositories
                 return null;
 
             return document.ConverterParaDomain();
+        }
+
+        public bool AlterarCompleto(Restaurante restaurante)
+        {
+            var document = new RestauranteSchema
+            {
+                Id = restaurante.Id,
+                Nome = restaurante.Nome,
+                Cozinha = restaurante.Cozinha,
+                Endereco = new EnderecoSchema
+                {
+                    Logradouro = restaurante.Endereco.Logradouro,
+                    Numero = restaurante.Endereco.Numero,
+                    Cidade = restaurante.Endereco.Cidade,
+                    Cep = restaurante.Endereco.Cep,
+                    UF = restaurante.Endereco.UF
+                }
+            };
+
+            var resultado = _restaurantes.ReplaceOne(_ => _.Id == document.Id, document);
+
+            return resultado.ModifiedCount > 0;
+        }
+
+        public bool AlterarCozinha(string id, ECozinha cozinha)
+        {
+            var atualizacao = Builders<RestauranteSchema>.Update.Set(_ => _.Cozinha, cozinha);
+
+            var resultado = _restaurantes.UpdateOne(_ => _.Id == id, atualizacao);
+
+            return resultado.ModifiedCount > 0;
         }
     }
 }
