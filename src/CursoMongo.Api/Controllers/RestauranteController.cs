@@ -265,5 +265,26 @@ namespace CursoMongo.Api.Controllers
                 }
             );
         }
+
+        [HttpGet("restaurante/textual")]
+        public async Task<ActionResult> ObterRestaurantePorBuscaTextual([FromQuery] string texto)
+        {
+            var restaurantes = await _restauranteRepository.ObterPorBuscaTextual(texto);
+
+            var listagem = restaurantes.ToList().Select(_ => new RestauranteListagem
+            {
+                Id = _.Id,
+                Nome = _.Nome,
+                Cozinha = (int)_.Cozinha,
+                Cidade = _.Endereco.Cidade
+            });
+
+            return Ok(
+                new
+                {
+                    data = listagem
+                }
+            );
+        }
     }
 }

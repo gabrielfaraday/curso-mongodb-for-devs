@@ -7,6 +7,7 @@ using MongoDB.Driver;
 using System.Linq;
 using CursoMongo.Api.Domain.Enums;
 using MongoDB.Bson;
+using MongoDB.Driver.Linq;
 
 namespace CursoMongo.Api.Data.Repositories
 {
@@ -150,6 +151,20 @@ namespace CursoMongo.Api.Data.Repositories
             var resultadoRestaurante = _restaurantes.DeleteOne(_ => _.Id == restauranteId);
 
             return (resultadoRestaurante.DeletedCount, resultadoAvaliacoes.DeletedCount);
+        }
+
+        public async Task<IEnumerable<Restaurante>> ObterPorBuscaTextual(string texto)
+        {
+            var restaurantes = new List<Restaurante>();
+
+            var filter = Builders<RestauranteSchema>.Filter.Text(texto);
+
+            await _restaurantes
+                .AsQueryable()
+                .Where(_ => filter.Inject())
+                .ForEachAsync(d => restaurantes.Add(d.ConverterParaDomain()));
+
+            return restaurantes;
         }
     }
 }
