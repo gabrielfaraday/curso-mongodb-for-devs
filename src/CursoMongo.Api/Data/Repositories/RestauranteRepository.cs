@@ -4,6 +4,7 @@ using CursoMongo.Api.Data.Schemas;
 using CursoMongo.Api.Domain.Entities;
 using CursoMongo.Api.Domain.ValueObjects;
 using MongoDB.Driver;
+using System.Linq;
 
 namespace CursoMongo.Api.Data.Repositories
 {
@@ -48,6 +49,16 @@ namespace CursoMongo.Api.Data.Repositories
             });
 
             return restaurantes;
+        }
+
+        public Restaurante ObterPorId(string id)
+        {
+            var document = _restaurantes.AsQueryable().FirstOrDefault(_ => _.Id == id);
+
+            if (document == null)
+                return null;
+
+            return document.ConverterParaDomain();
         }
     }
 }
