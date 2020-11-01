@@ -196,5 +196,34 @@ namespace CursoMongo.Api.Controllers
                 }
             );
         }
+
+        [HttpPatch("restaurante/{id}/avaliar")]
+        public ActionResult AvaliarRestaurante(string id, [FromBody] AvaliacaoInclusao avaliacaoInclusao)
+        {
+            var restaurante = _restauranteRepository.ObterPorId(id);
+
+            if (restaurante == null)
+                return NotFound();
+
+            var avaliacao = new Avaliacao(avaliacaoInclusao.Estrelas, avaliacaoInclusao.Comentario);
+
+            if (!avaliacao.Validar())
+            {
+                return BadRequest(
+                    new
+                    {
+                        errors = avaliacao.ValidationResult.Errors.Select(_ => _.ErrorMessage)
+                    });
+            }
+
+            _restauranteRepository.Avaliar(id, avaliacao);
+
+            return Ok(
+                new
+                {
+                    data = "Restaurante avaliado com sucesso"
+                }
+            );
+        }
     }
 }
