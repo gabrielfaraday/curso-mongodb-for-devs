@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using CursoMongo.Api.Controllers.Inputs;
+using CursoMongo.Api.Controllers.Outputs;
 using CursoMongo.Api.Data.Repositories;
 using CursoMongo.Api.Domain.Entities;
 using CursoMongo.Api.Domain.Enums;
@@ -48,6 +50,27 @@ namespace CursoMongo.Api.Controllers
                 new
                 {
                     data = "Restaurante inserido com sucesso"
+                }
+            );
+        }
+
+        [HttpGet("restaurante/todos")]
+        public async Task<ActionResult> ObterRestaurantes()
+        {
+            var restaurantes = await _restauranteRepository.ObterTodos();
+
+            var listagem = restaurantes.Select(_ => new RestauranteListagem
+            {
+                Id = _.Id,
+                Nome = _.Nome,
+                Cozinha = (int)_.Cozinha,
+                Cidade = _.Endereco.Cidade
+            });
+
+            return Ok(
+                new
+                {
+                    data = listagem
                 }
             );
         }

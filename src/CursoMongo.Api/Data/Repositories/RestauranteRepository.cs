@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using CursoMongo.Api.Data.Schemas;
 using CursoMongo.Api.Domain.Entities;
+using CursoMongo.Api.Domain.ValueObjects;
 using MongoDB.Driver;
 
 namespace CursoMongo.Api.Data.Repositories
@@ -30,6 +33,21 @@ namespace CursoMongo.Api.Data.Repositories
             };
 
             _restaurantes.InsertOne(document);
+        }
+
+        public async Task<IEnumerable<Restaurante>> ObterTodos()
+        {
+            var restaurantes = new List<Restaurante>();
+
+            await _restaurantes.AsQueryable().ForEachAsync(d =>
+            {
+                var r = new Restaurante(d.Id.ToString(), d.Nome, d.Cozinha);
+                var e = new Endereco(d.Endereco.Logradouro, d.Endereco.Numero, d.Endereco.Cidade, d.Endereco.UF, d.Endereco.Cep);
+                r.AtribuirEndereco(e);
+                restaurantes.Add(r);
+            });
+
+            return restaurantes;
         }
     }
 }
