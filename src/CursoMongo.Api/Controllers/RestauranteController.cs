@@ -225,5 +225,45 @@ namespace CursoMongo.Api.Controllers
                 }
             );
         }
+
+        [HttpGet("restaurante/top3")]
+        public async Task<ActionResult> ObterTop3Restaurantes()
+        {
+            var top3 = await _restauranteRepository.ObterTop3();
+
+            var listagem = top3.Select(_ => new RestauranteTop3
+            {
+                Id = _.Key.Id,
+                Nome = _.Key.Nome,
+                Cozinha = (int)_.Key.Cozinha,
+                Cidade = _.Key.Endereco.Cidade,
+                Estrelas = _.Value
+            });
+
+            return Ok(
+                new
+                {
+                    data = listagem
+                }
+            );
+        }
+
+        [HttpDelete("restaurante/{id}")]
+        public ActionResult Remover(string id)
+        {
+            var restaurante = _restauranteRepository.ObterPorId(id);
+
+            if (restaurante == null)
+                return NotFound();
+
+            (var totalRestauranteRemovido, var totalAvaliacoesRemovidas) = _restauranteRepository.Remover(id);
+
+            return Ok(
+                new
+                {
+                    data = $"Total de exclusões: {totalRestauranteRemovido} restaurante com {totalAvaliacoesRemovidas} avaliações"
+                }
+            );
+        }
     }
 }

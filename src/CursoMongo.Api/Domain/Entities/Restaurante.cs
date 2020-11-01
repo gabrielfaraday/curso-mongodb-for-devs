@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CursoMongo.Api.Domain.Enums;
 using CursoMongo.Api.Domain.ValueObjects;
 using FluentValidation;
@@ -11,6 +12,7 @@ namespace CursoMongo.Api.Domain.Entities
         {
             Nome = nome;
             Cozinha = cozinha;
+            Avaliacoes = new List<Avaliacao>();
         }
         
         public Restaurante(string id, string nome, ECozinha cozinha)
@@ -18,18 +20,25 @@ namespace CursoMongo.Api.Domain.Entities
             Id = id;
             Nome = nome;
             Cozinha = cozinha;
+            Avaliacoes = new List<Avaliacao>();
         }
 
         public string Id { get; private set; }
         public string Nome { get; private set; }
         public ECozinha Cozinha { get; private set; }
         public Endereco Endereco { get; private set; }
+        public List<Avaliacao> Avaliacoes { get; private set; }
 
         public ValidationResult ValidationResult { get; set; }
 
         public void AtribuirEndereco(Endereco endereco)
         {
             Endereco = endereco;
+        }
+
+        public void InserirAvaliacao(Avaliacao avaliacao)
+        {
+            Avaliacoes.Add(avaliacao);
         }
 
         public virtual bool Validar()

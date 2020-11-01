@@ -99,7 +99,7 @@ namespace CursoMongo.Api.Data.Repositories
         public IEnumerable<Restaurante> ObterPorNome(string nome)
         {
             var restaurantes = new List<Restaurante>();
-            
+
             _restaurantes.AsQueryable()
                 .Where(_ => _.Nome.ToLower().Contains(nome.ToLower()))
                 .ToList()
@@ -112,12 +112,44 @@ namespace CursoMongo.Api.Data.Repositories
         {
             var document = new AvaliacaoSchema
             {
-               RestauranteId = restauranteId,
-               Estrelas = avaliacao.Estrelas,
-               Comentario = avaliacao.Comentario
+                RestauranteId = restauranteId,
+                Estrelas = avaliacao.Estrelas,
+                Comentario = avaliacao.Comentario
             };
 
             _avaliacoes.InsertOne(document);
+        }
+
+        public async Task<Dictionary<Restaurante, double>> ObterTop3()
+        {
+            var retorno = new Dictionary<Restaurante, double>();
+
+            var top3 = _avaliacoes.Aggregate()
+                .Group(_ => _.RestauranteId, g => new { RestauranteId = g.Key, MediaEstrelas = g.Average(a => a.Estrelas)})
+                .SortByDescending(_ => _.MediaEstrelas)
+                .Limit(3);
+
+            await top3.ForEachAsync(_ =>
+            {
+                var restaurante = ObterPorId(_.RestauranteId);
+                
+                _avaliacoes.AsQueryable()
+                    .Where(a => a.RestauranteId == _.RestauranteId)
+                    .ToList()
+                    .ForEach(a => restaurante.InserirAvaliacao(a.ConverterParaDomain()));
+
+                retorno.Add(restaurante, _.MediaEstrelas);
+            });
+
+            return retorno;
+        }
+
+        public (long, long) Remover(string restauranteId)
+        {
+            var resultadoAvaliacoes = _avaliacoes.DeleteMany(_ => _.RestauranteId == restauranteId);
+            var resultadoRestaurante = _restaurantes.DeleteOne(_ => _.Id == restauranteId);
+
+            return (resultadoRestaurante.DeletedCount, resultadoAvaliacoes.DeletedCount);
         }
     }
 }
