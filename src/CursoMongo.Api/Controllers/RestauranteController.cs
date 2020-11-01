@@ -175,5 +175,26 @@ namespace CursoMongo.Api.Controllers
                 }
             );
         }
+
+        [HttpGet("restaurante")]
+        public ActionResult ObterRestaurantePorNome([FromQuery] string nome)
+        {
+            var restaurantes = _restauranteRepository.ObterPorNome(nome);
+
+             var listagem = restaurantes.Select(_ => new RestauranteListagem
+            {
+                Id = _.Id,
+                Nome = _.Nome,
+                Cozinha = (int)_.Cozinha,
+                Cidade = _.Endereco.Cidade
+            });
+
+            return Ok(
+                new
+                {
+                    data = listagem
+                }
+            );
+        }
     }
 }
