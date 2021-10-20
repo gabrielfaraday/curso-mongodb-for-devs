@@ -1,7 +1,9 @@
 # curso-mongodb-for-devs
 
-Este repositorio é resultado do projeto final do curso MongoDB para Desenvolvedores - COMPLETO:
+Este repositorio é resultado do projeto final do curso MongoDB para Desenvolvedores .NET
 
-https://www.udemy.com/course/mongodb4devs/?referralCode=6515241DC30C5DA145AB
+https://www.youtube.com/watch?v=N82ggZW2tEU
 
 Te convido a ver a grade do curso e participar dessa jornada comigo!
+
+Dúvidas sobre o curso entre em contato comigo!
